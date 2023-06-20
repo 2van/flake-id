@@ -1,6 +1,7 @@
 // 64bit, 2^64≈1.84e19，字符串长度需要20，可按一下分配
 // 13 + 3 + 4:【时间戳offset 13】【1000台机器，3】【每台速度峰值1万个/ms, 4】支持58年
 // 14 + 3 + 3:【时间戳offset 14】【1000台机器，3】【每台速度峰值1千个/ms, 3】支持584年
+// !WARNING: 初始化前应该在外部保证时间的一致性。获取平均时间/NTP时间，计算时间偏移量，超过阈值则报错或
 function flakeId(opt = {}) {
   let { epoch, id, region = 0, worker = 0 } = opt;
   if (id != undefined) {
@@ -23,6 +24,20 @@ function flakeId(opt = {}) {
 flakeId.prototype.next = function (cb) {
   let id = '';
   const offset = Date.now() - this.epoch;
+  // 时钟回拨
+  if (offset < this.lastOffset) {
+    if (cb) {
+      setTimeout(() => {
+        this.next(cb);
+      }, this.lastTime - time);
+      return;
+    }
+    throw new Error(
+      `Clock moved backwards. Refusing to generate id for ${
+        this.lastTime - time
+      } milliseconds`
+    );
+  }
   if (offset == this.lastOffset) {
     if (this.overflow) {
       if (cb) {
