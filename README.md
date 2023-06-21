@@ -1,3 +1,10 @@
+# Install
+
+```bash
+npm install --save @liber8/flake-id
+```
+
+
 # How to use
 
 ```js
