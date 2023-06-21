@@ -1,11 +1,12 @@
 # How to use
 
 ```js
-const FlakeId = require('flake-id');
+const flakeId = require('flake-id');
+const flake = new flakeId();
 
-const newId = FlakeId.next();
+const newId = flake.next();
 // or
-FlakeId.next((err, id) => {
+flake.next((err, id) => {
   console.log(id);
 });
 ```

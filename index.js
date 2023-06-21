@@ -3,7 +3,7 @@
 // 14 + 3 + 3:【时间戳offset 14】【1000台机器，3】【每台速度峰值1千个/ms, 3】支持584年
 // !WARNING: 初始化前应该在外部保证时间的一致性。获取平均时间/NTP时间，计算时间偏移量，超过阈值则报错或
 function flakeId(opt = {}) {
-  let { epoch, id, region = 0, worker = 0 } = opt;
+  let { epoch, id, region = 0, worker = 0, maxSeqCount } = opt;
   if (id != undefined) {
     if (id >= 1e3) {
       throw new Error('id must be less than 1000');
@@ -20,6 +20,7 @@ function flakeId(opt = {}) {
   this.epoch = epoch ?? 0;
   this.lastOffset = 0;
   this.seq = 0;
+  this.maxSeqCount = maxSeqCount || 1e4;
 }
 flakeId.prototype.next = function (cb) {
   let id = '';
@@ -50,7 +51,7 @@ flakeId.prototype.next = function (cb) {
       }
     }
     this.seq++;
-    if (this.seq >= 1e4) {
+    if (this.seq >= this.maxSeqCount) {
       this.seq = 0;
       this.overflow = true;
       if (cb) {

@@ -1,10 +1,10 @@
 {
   "name": "@liber8/flake-id",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Flake ID generator by assembling string",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test"
   },
   "keywords": [
     "flake",
